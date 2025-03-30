@@ -1,0 +1,46 @@
+' Worksheet:SelectionChange
+
+        ' Construction de la commande avec Cfg
+        cmd = Cfg.PYTHON_EXE & " " & _
+              """" & Cfg.GetPythonScript("MouseAutomation.py") & """ " & _
+              """" & Cfg.GetMouseRecorderPath("PlaceSymboleSurChartPrincipale.txt") & """ " & _
+              liFenetreDeConfirmation & " " & _
+              liClickPositionOriginal
+
+
+' AutoCopyPastMarkekQ:Click
+    cmd = Cfg.PYTHON_EXE & " " & _
+          """" & Cfg.GetPythonScript("Start_stop_surveillance.py") & """"
+
+'Général:AutoCopyPastMarketQ_click
+    cmd = Cfg.PYTHON_EXE & " " & _
+          """" & Cfg.GetPythonScript("Start_stop_surveillance.py") & """"
+
+'general:PlacerSymbolesMarketQ
+    Dim cmd As String
+    cmd = Cfg.PYTHON_EXE & " " & _
+          """" & Cfg.GetPythonScript("MouseAutomotionForVBA.py") & """ " & _
+          """" & filePath & """ " & _
+          "0 0 " & _
+          """" & symbolsArg & """"
+          
+    Debug.Print cmd
+
+
+
+    Dim wsh As Object
+    Dim cmd As String
+    
+    Set wsh = CreateObject("WScript.Shell")
+    
+    cmd = Cfg.PYTHON_EXE & " " & _
+          """" & Cfg.GetPythonScript("Start_stop_surveillance.py") & """"
+    
+    On Error Resume Next
+    wsh.Run cmd, 0, False
+    If Err.Number <> 0 Then
+        MsgBox "Erreur lors de l'exécution du script Python: " & Err.Description, vbCritical
+    End If
+    On Error GoTo 0
+    
+    Set wsh = Nothing

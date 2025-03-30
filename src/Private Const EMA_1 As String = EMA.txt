@@ -1,0 +1,89 @@
+Private Const EMA_1 As String = "EMA-1"
+Private Const EMA_X As String = "EMA-12"
+Private Const MA_d1 As String = "MA-d1"
+Private Const MA_dX As String = "MA-d30"
+Sub SetupHorizontalEMA()
+    On Error GoTo ErrorHandler
+
+    'Déclaration des variables
+    Dim UtileRowMin As Long, UtileRowMax As Long
+    Dim Col_EMA1 As String, Col_EMAX As String, ColData1 As String, ColDataX As String
+    Dim i As Integer, j As Integer, s As Integer
+    Dim strFormula As String
+    Dim Region_EMAn As String
+    Dim isFormulaValid As Boolean
+    Dim ColNumberMAE_1 As Integer
+    Dim ColNumberMAE_X As Integer
+    Dim ColNumberData_1 As Integer
+    Dim ColNumberData_X As Integer
+
+    'Initialisation des lignes utiles
+    UtileRowMin = gv.i_RowUtileLow
+    UtileRowMax = gv.i_RowUtileMax
+
+    'Validation des lignes utiles
+    If UtileRowMin <= 0 Or UtileRowMax <= 0 Or UtileRowMin > UtileRowMax Then
+        MsgBox "Plages de lignes invalides !", vbCritical
+        Exit Sub
+    End If
+
+    Col_EMA1 = f.FindInRow(EMA_1, 2)
+    Col_EMAX = f.FindInRow(EMA_X, 2)
+    ColData1 = f.FindInRow(MA_d1, 2)  ' debut Colonne des données historiques
+    ColDataX = f.FindInRow(MA_dX, 2) ' fin Colonne des données historiques
+
+    ColNumberMAE_1 = f.FindColumnNumberByTexColumn(Col_EMA1)
+    ColNumberMAE_X = f.FindColumnNumberByTexColumn(Col_EMAX)
+    ColNumberData_1 = f.FindColumnNumberByTexColumn(ColData1)
+    ColNumberData_X = f.FindColumnNumberByTexColumn(ColDataX)
+
+    If Col_EMA1 = "" Then
+        MsgBox "Colonne EMA-1 non trouvée !", vbCritical
+        Exit Sub
+    End If
+
+    If ColData1 = "" And ColDataX = "" Then
+        MsgBox "Colonne MA-d1 non trouvée !", vbCritical
+        Exit Sub
+    End If
+
+    With Application
+      '  .ScreenUpdating = False
+      '  .Calculation = xlCalculationManual
+      Dim rgnMAE As Range
+
+      strRange = "=" & Col_EMA1 & UtileRowMin & ":" & Col_EMA1 & UtileRowMax
+
+       rngMAE = Range(strRange)
+       strFormula = "=" & ColData1 & UtileRowMin & ")"
+       rngMAE.formula = strFormula
+
+       For i = ColNumberMAE_1 + 1 To ColNumberMAE_X
+
+                ' Region_EMAn.formula = strFormula
+
+                strFormula = "=" & ColData1 & i & ColData1 & i
+                Region_EMAn = "Range(" & Col_EMA1 & UtileRowMin & ":" & Col_EMA1 & UtileRowMax & ")"
+
+        Next
+
+        .Calculation = xlCalculationAutomatic
+        .ScreenUpdating = True
+    End With
+
+    MsgBox "Calcul des EMA terminé !", vbInformation
+    Exit Sub
+
+ErrorHandler:
+    Select Case Err.Number
+        Case 1004
+            MsgBox "Référence de plage ou de colonne invalide !", vbCritical
+        Case 13
+            MsgBox "Incompatibilité de type dans les données !", vbCritical
+        Case Else
+            MsgBox "Erreur " & Err.Number & " : " & Err.Description, vbCritical
+    End Select
+
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+End Sub

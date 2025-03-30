@@ -1,0 +1,45 @@
+import tkinter as tk
+import pyautogui
+import os
+import sys
+
+lcRepertoirDuScript = os.path.dirname(os.path.realpath(__file__))
+os.chdir(lcRepertoirDuScript)
+
+try:
+    file_name = sys.argv[1]
+except IndexError:
+    file_name = ".\\MouseRecorderData\\MousePutSymbo16ChartTradingView.txt"
+
+file = open(file_name, "w")
+
+root = tk.Tk()
+root.title("Enregistreur de position de la souris")
+
+text_widget = tk.Text(root)
+text_widget.pack()
+
+def on_space_pressed(event):
+    x, y = pyautogui.position()
+    position = f"({x}, {y})\n"
+    file.write(position)
+    text_widget.insert(tk.END, position)
+
+root.bind('<space>', on_space_pressed)
+
+def on_accept():
+    file.close()
+    os.startfile(file_name)
+    root.quit()
+
+def on_cancel():
+    file.close()
+    os.remove(file_name)
+    root.quit()
+
+accept_button = tk.Button(root, text="Accepter", command=on_accept)
+cancel_button = tk.Button(root, text="Annuler", command=on_cancel)
+accept_button.pack()
+cancel_button.pack()
+
+root.mainloop()
